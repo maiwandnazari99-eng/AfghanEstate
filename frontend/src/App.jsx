@@ -1,62 +1,78 @@
-import { useEffect, useState } from 'react'
+import './i18n'
+import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { postJson } from './api'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Register from './pages/Register'
 
-const API = 'http://127.0.0.1:8000'
+function readUser() {
+  try {
+    return JSON.parse(localStorage.getItem('user')) || null
+  } catch {
+    return null
+  }
+}
 
-export default function App() {
-  const [properties, setProperties] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+function Shell() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [user, setUser] = useState(readUser)
 
-  useEffect(() => {
-    fetch(`${API}/api/properties`, { headers: { Accept: 'application/json' } })
-      .then((res) => {
-        if (!res.ok) throw new Error('Server error ' + res.status)
-        return res.json()
-      })
-      .then((data) => setProperties(data.data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [])
+  function handleLogin(data) {
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data.user))
+    setUser(data.user)
+    navigate('/')
+  }
+
+  async function handleLogout() {
+    const token = localStorage.getItem('token')
+
+    try {
+      await postJson('/api/logout', {}, token)
+    } catch {
+      // even if the server is unreachable, we still log out here
+    }
+
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+    navigate('/')
+  }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: 24 }}>
-      <h1>Afghan Estate</h1>
-      <p>Latest properties</p>
+    <>
+      <nav style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #444' }}>
+        <Link to="/" style={{ fontWeight: 700 }}>{t('app.title')}</Link>
+        <span style={{ flex: 1 }} />
+        {user ? (
+          <>
+            <span>{t('nav.hello', { name: user.name })}</span>
+            <button onClick={handleLogout}>{t('nav.logout')}</button>
+          </>
+        ) : (
+          <>
+            <Link to="/login">{t('nav.login')}</Link>
+            <Link to="/register">{t('nav.register')}</Link>
+          </>
+        )}
+      </nav>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'tomato' }}>Could not load properties: {error}</p>}
-      {!loading && !error && properties.length === 0 && <p>No properties yet.</p>}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
+        <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
+      </Routes>
+    </>
+  )
+}
 
-      <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
-        {properties.map((p) => {
-          const cover = p.images?.find((img) => img.is_cover) || p.images?.[0]
-
-          return (
-            <div key={p.id} style={{ border: '1px solid #888', borderRadius: 12, overflow: 'hidden' }}>
-              {cover ? (
-                <img src={API + cover.image_url} alt={p.title} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
-              ) : (
-                <div style={{ height: 160, background: '#444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  No photo
-                </div>
-              )}
-
-              <div style={{ padding: 12 }}>
-                <h3 style={{ margin: '0 0 8px' }}>{p.title}</h3>
-                <p style={{ margin: '0 0 4px' }}>
-                  {p.property_type?.name} · {p.city?.name}
-                </p>
-                <p style={{ margin: '0 0 4px' }}>
-                  {Number(p.price).toLocaleString()} {p.currency} ({p.listing_type === 'sale' ? 'For sale' : 'For rent'})
-                </p>
-                <p style={{ margin: 0 }}>
-                  {p.bedrooms} bed · {p.bathrooms} bath · {Number(p.area_size)} {p.area_unit}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Shell />
+    </BrowserRouter>
   )
 }
