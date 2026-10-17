@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Link, Navigate, useNavigate } from 'react
 import { useTranslation } from 'react-i18next'
 import { postJson } from './api'
 import Home from './pages/Home'
+import PropertyDetails from './pages/PropertyDetails'
 import Login from './pages/Login'
 import Register from './pages/Register'
 
@@ -62,6 +63,7 @@ function Shell() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
         <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
       </Routes>

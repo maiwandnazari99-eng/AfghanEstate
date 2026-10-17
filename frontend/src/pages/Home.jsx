@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { API } from '../api'
 
@@ -32,7 +33,11 @@ export default function Home() {
           const cover = p.images?.find((img) => img.is_cover) || p.images?.[0]
 
           return (
-            <div key={p.id} style={{ border: '1px solid #888', borderRadius: 12, overflow: 'hidden' }}>
+            <Link
+              key={p.id}
+              to={`/properties/${p.id}`}
+              style={{ color: 'inherit', textDecoration: 'none', border: '1px solid #888', borderRadius: 12, overflow: 'hidden', display: 'block' }}
+            >
               {cover ? (
                 <img src={API + cover.image_url} alt={p.title} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
               ) : (
@@ -53,7 +58,7 @@ export default function Home() {
                   {t('property.beds', { value: p.bedrooms })} · {t('property.baths', { value: p.bathrooms })} · {Number(p.area_size)} {p.area_unit}
                 </p>
               </div>
-            </div>
+            </Link>
           )
         })}
       </div>
