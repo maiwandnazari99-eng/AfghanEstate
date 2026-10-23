@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { postJson } from './api'
 import Home from './pages/Home'
 import PropertyDetails from './pages/PropertyDetails'
+import AddProperty from './pages/AddProperty'
 import Login from './pages/Login'
 import Register from './pages/Register'
 
@@ -50,6 +51,7 @@ function Shell() {
         <span style={{ flex: 1 }} />
         {user ? (
           <>
+            {user.role === 'agent' && <Link to="/add-property">{t('nav.addProperty')}</Link>}
             <span>{t('nav.hello', { name: user.name })}</span>
             <button onClick={handleLogout}>{t('nav.logout')}</button>
           </>
@@ -64,6 +66,7 @@ function Shell() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
+        <Route path="/add-property" element={<AddProperty user={user} />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
         <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
       </Routes>

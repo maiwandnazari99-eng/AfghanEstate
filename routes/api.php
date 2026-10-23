@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\InquiryController;
+use App\Http\Controllers\Api\LookupController;
 use App\Http\Controllers\Api\PropertyController;
 use App\Http\Controllers\Api\PropertyImageController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,10 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/{id}', [PropertyController::class, 'show']);
+
+Route::get('/property-types', [LookupController::class, 'propertyTypes']);
+Route::get('/cities', [LookupController::class, 'cities']);
+Route::get('/cities/{id}/districts', [LookupController::class, 'districts']);
 
 // آدرس‌های محافظت‌شده (فقط کاربر واردشده با توکن)
 Route::middleware('auth:sanctum')->group(function () {

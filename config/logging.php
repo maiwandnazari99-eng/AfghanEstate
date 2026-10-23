@@ -73,6 +73,7 @@ return [
             'replace_placeholders' => true,
         ],
 
+        
         'monthly' => [
             'driver' => 'monthly',
             'path' => storage_path('logs/laravel.log'),
