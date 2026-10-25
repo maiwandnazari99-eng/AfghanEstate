@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Favorite;
 use App\Models\Property;
 use Illuminate\Http\Request;
 
@@ -45,7 +46,7 @@ class PropertyController extends Controller
     }
 
     // جزئیات یک ملک (برای همه)
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $property = Property::with([
             'propertyType',
@@ -56,6 +57,15 @@ class PropertyController extends Controller
             'features',
             'agent.user:id,name',
         ])->findOrFail($id);
+
+        // اگر کاربر وارد شده باشد، مشخص می‌کنیم این ملک را نشان‌دار کرده یا نه
+        $user = $request->user('sanctum');
+        $property->setAttribute(
+            'is_favorite',
+            $user
+                ? Favorite::where('user_id', $user->id)->where('property_id', $property->id)->exists()
+                : false
+        );
 
         return response()->json($property);
     }

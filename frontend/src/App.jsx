@@ -6,6 +6,7 @@ import { postJson } from './api'
 import Home from './pages/Home'
 import PropertyDetails from './pages/PropertyDetails'
 import AddProperty from './pages/AddProperty'
+import Favorites from './pages/Favorites'
 import Login from './pages/Login'
 import Register from './pages/Register'
 
@@ -52,6 +53,7 @@ function Shell() {
         {user ? (
           <>
             {user.role === 'agent' && <Link to="/add-property">{t('nav.addProperty')}</Link>}
+            {(user.role === 'buyer' || user.role === 'tenant') && <Link to="/favorites">{t('nav.favorites')}</Link>}
             <span>{t('nav.hello', { name: user.name })}</span>
             <button onClick={handleLogout}>{t('nav.logout')}</button>
           </>
@@ -67,6 +69,7 @@ function Shell() {
         <Route path="/" element={<Home />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/add-property" element={<AddProperty user={user} />} />
+        <Route path="/favorites" element={<Favorites user={user} />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
         <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
       </Routes>

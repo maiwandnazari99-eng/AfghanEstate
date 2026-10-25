@@ -3,17 +3,35 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { API } from '../api'
 
+function readUser() {
+  try {
+    return JSON.parse(localStorage.getItem('user')) || null
+  } catch {
+    return null
+  }
+}
+
 export default function PropertyDetails() {
   const { id } = useParams()
   const { t } = useTranslation()
+  const user = readUser()
+  const canSave = user && (user.role === 'buyer' || user.role === 'tenant')
+
   const [property, setProperty] = useState(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState('')
   const [selected, setSelected] = useState(0)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [favBusy, setFavBusy] = useState(false)
+  const [favError, setFavError] = useState('')
 
   useEffect(() => {
-    fetch(`${API}/api/properties/${id}`, { headers: { Accept: 'application/json' } })
+    const token = localStorage.getItem('token')
+    const headers = { Accept: 'application/json' }
+    if (token) headers.Authorization = `Bearer ${token}`
+
+    fetch(`${API}/api/properties/${id}`, { headers })
       .then((res) => {
         if (res.status === 404) {
           setNotFound(true)
@@ -23,11 +41,37 @@ export default function PropertyDetails() {
         return res.json()
       })
       .then((data) => {
-        if (data) setProperty(data)
+        if (data) {
+          setProperty(data)
+          setIsFavorite(Boolean(data.is_favorite))
+        }
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [id])
+
+  async function toggleFavorite() {
+    const token = localStorage.getItem('token')
+    setFavBusy(true)
+    setFavError('')
+
+    try {
+      const res = await fetch(`${API}/api/properties/${id}/favorite`, {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      })
+
+      if (res.ok) {
+        setIsFavorite(!isFavorite)
+      } else {
+        setFavError(t('property.favoriteError'))
+      }
+    } catch {
+      setFavError(t('common.networkError'))
+    } finally {
+      setFavBusy(false)
+    }
+  }
 
   const wrapStyle = { maxWidth: 900, margin: '0 auto', padding: 24 }
   const backLink = <Link to="/">← {t('property.back')}</Link>
@@ -106,6 +150,15 @@ export default function PropertyDetails() {
       <p style={{ marginTop: 0 }}>
         {property.listing_type === 'sale' ? t('property.forSale') : t('property.forRent')} · {t(`property.status_${property.status}`)}
       </p>
+
+      {canSave && (
+        <div style={{ margin: '8px 0 16px' }}>
+          <button onClick={toggleFavorite} disabled={favBusy} style={{ padding: '8px 14px', cursor: 'pointer' }}>
+            {isFavorite ? '♥ ' + t('property.saved') : '♡ ' + t('property.save')}
+          </button>
+          {favError && <p style={{ color: 'tomato', margin: '8px 0 0' }}>{favError}</p>}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gap: 8, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', margin: '16px 0' }}>
         <div><strong>{t('property.bedrooms')}</strong><br />{property.bedrooms ?? '-'}</div>

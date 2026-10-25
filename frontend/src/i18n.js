@@ -15,6 +15,7 @@ const en = {
       logout: 'Log out',
       hello: 'Hello, {{name}}',
       addProperty: 'Add property',
+      favorites: 'Favorites',
     },
     auth: {
       loginTitle: 'Log in to your account',
@@ -56,6 +57,13 @@ const en = {
       status_available: 'Available',
       status_sold: 'Sold',
       status_rented: 'Rented',
+      save: 'Save to favorites',
+      saved: 'Saved to favorites',
+      favoriteError: 'Could not update your favorites.',
+    },
+    favorites: {
+      title: 'My favorites',
+      empty: 'You have not saved any properties yet.',
     },
     add: {
       title: 'Add a new property',
