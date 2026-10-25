@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { API } from '../api'
+import { API, postJson, firstError } from '../api'
 
 function readUser() {
   try {
@@ -25,6 +25,11 @@ export default function PropertyDetails() {
   const [isFavorite, setIsFavorite] = useState(false)
   const [favBusy, setFavBusy] = useState(false)
   const [favError, setFavError] = useState('')
+  const [subject, setSubject] = useState('')
+  const [messageText, setMessageText] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [formError, setFormError] = useState('')
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -70,6 +75,30 @@ export default function PropertyDetails() {
       setFavError(t('common.networkError'))
     } finally {
       setFavBusy(false)
+    }
+  }
+
+  async function sendInquiry(e) {
+    e.preventDefault()
+    setFormError('')
+    setSent(false)
+    setSending(true)
+
+    try {
+      const token = localStorage.getItem('token')
+      const { ok, data } = await postJson(`/api/properties/${id}/inquiries`, { subject, message: messageText }, token)
+
+      if (ok) {
+        setSent(true)
+        setSubject('')
+        setMessageText('')
+      } else {
+        setFormError(firstError(data))
+      }
+    } catch {
+      setFormError(t('common.networkError'))
+    } finally {
+      setSending(false)
     }
   }
 
@@ -177,6 +206,40 @@ export default function PropertyDetails() {
         {property.agent?.user?.name}
         {property.agent?.agency_name ? ` · ${property.agent.agency_name}` : ''}
       </p>
+
+      {canSave && (
+        <div style={{ marginTop: 24 }}>
+          <h3>{t('contact.title')}</h3>
+          <form onSubmit={sendInquiry} style={{ display: 'grid', gap: 12 }}>
+            <input
+              type="text"
+              placeholder={t('contact.subject')}
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              maxLength={255}
+              style={{ padding: 8, boxSizing: 'border-box', width: '100%' }}
+            />
+            <textarea
+              placeholder={t('contact.message')}
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              required
+              rows={4}
+              maxLength={2000}
+              style={{ padding: 8, boxSizing: 'border-box', width: '100%' }}
+            />
+            {formError && <p style={{ color: 'tomato', margin: 0 }}>{formError}</p>}
+            {sent && (
+              <p style={{ margin: 0 }}>
+                {t('contact.sent')} <Link to="/messages">{t('contact.openMessages')}</Link>
+              </p>
+            )}
+            <button type="submit" disabled={sending} style={{ padding: 10 }}>
+              {sending ? t('auth.working') : t('contact.send')}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   )
 }
