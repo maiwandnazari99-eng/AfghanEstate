@@ -23,6 +23,8 @@ Route::get('/cities/{id}/districts', [LookupController::class, 'districts']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::get('/my-properties', [PropertyController::class, 'mine']);
+
     Route::post('/properties', [PropertyController::class, 'store']);
     Route::put('/properties/{id}', [PropertyController::class, 'update']);
     Route::delete('/properties/{id}', [PropertyController::class, 'destroy']);

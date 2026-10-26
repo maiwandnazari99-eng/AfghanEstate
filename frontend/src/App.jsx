@@ -6,6 +6,7 @@ import { postJson } from './api'
 import Home from './pages/Home'
 import PropertyDetails from './pages/PropertyDetails'
 import AddProperty from './pages/AddProperty'
+import MyProperties from './pages/MyProperties'
 import Favorites from './pages/Favorites'
 import Messages from './pages/Messages'
 import Login from './pages/Login'
@@ -54,6 +55,7 @@ function Shell() {
         {user ? (
           <>
             {user.role === 'agent' && <Link to="/add-property">{t('nav.addProperty')}</Link>}
+            {user.role === 'agent' && <Link to="/my-properties">{t('nav.myProperties')}</Link>}
             {(user.role === 'buyer' || user.role === 'tenant') && <Link to="/favorites">{t('nav.favorites')}</Link>}
             <Link to="/messages">{t('nav.messages')}</Link>
             <span>{t('nav.hello', { name: user.name })}</span>
@@ -71,6 +73,7 @@ function Shell() {
         <Route path="/" element={<Home />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/add-property" element={<AddProperty user={user} />} />
+        <Route path="/my-properties" element={<MyProperties user={user} />} />
         <Route path="/favorites" element={<Favorites user={user} />} />
         <Route path="/messages" element={<Messages user={user} />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />

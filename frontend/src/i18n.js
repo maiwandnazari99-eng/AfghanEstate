@@ -15,6 +15,7 @@ const en = {
       logout: 'Log out',
       hello: 'Hello, {{name}}',
       addProperty: 'Add property',
+      myProperties: 'My properties',
       favorites: 'Favorites',
       messages: 'Messages',
     },
@@ -83,6 +84,15 @@ const en = {
       close: 'Close conversation',
       closedInfo: 'This conversation is closed.',
       noSubject: '(no subject)',
+    },
+    mine: {
+      title: 'My properties',
+      empty: 'You have not added any properties yet.',
+      agentsOnly: 'Only agents have properties.',
+      delete: 'Delete',
+      confirmDelete: 'Delete this property? This cannot be undone.',
+      view: 'View',
+      updateError: 'Could not update the property.',
     },
     favorites: {
       title: 'My favorites',

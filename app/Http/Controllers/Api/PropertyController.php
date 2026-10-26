@@ -70,6 +70,30 @@ class PropertyController extends Controller
         return response()->json($property);
     }
 
+    // ملک‌های خود agent (با همه‌ی وضعیت‌ها)
+    public function mine(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'agent') {
+            return response()->json([
+                'message' => 'Only agents have properties',
+            ], 403);
+        }
+
+        $properties = Property::with([
+            'propertyType',
+            'city',
+            'district',
+            'images',
+        ])
+            ->where('agent_id', $user->id)
+            ->latest()
+            ->paginate(20);
+
+        return response()->json($properties);
+    }
+
     // اضافه کردن ملک جدید (فقط agent)
     public function store(Request $request)
     {
