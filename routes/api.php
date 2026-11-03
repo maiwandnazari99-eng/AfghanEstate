@@ -18,6 +18,7 @@ Route::get('/properties/{id}', [PropertyController::class, 'show']);
 Route::get('/property-types', [LookupController::class, 'propertyTypes']);
 Route::get('/cities', [LookupController::class, 'cities']);
 Route::get('/cities/{id}/districts', [LookupController::class, 'districts']);
+Route::get('/amenities', [LookupController::class, 'amenities']);
 
 // آدرس‌های محافظت‌شده (فقط کاربر واردشده با توکن)
 Route::middleware('auth:sanctum')->group(function () {

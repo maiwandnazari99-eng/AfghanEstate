@@ -32,6 +32,15 @@ class PropertyController extends Controller
             $query->where('property_type_id', $request->property_type_id);
         }
 
+        if ($request->filled('q')) {
+            $keyword = $request->q;
+
+            $query->where(function ($sub) use ($keyword) {
+                $sub->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('address', 'like', "%{$keyword}%");
+            });
+        }
+
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
@@ -121,12 +130,18 @@ class PropertyController extends Controller
             'address'          => 'required|string|max:255',
             'latitude'         => 'nullable|numeric|between:-90,90',
             'longitude'        => 'nullable|numeric|between:-180,180',
+            'amenities'        => 'sometimes|array',
+            'amenities.*'      => 'integer|exists:amenities,id',
         ]);
+
+        $amenityIds = $data['amenities'] ?? [];
+        unset($data['amenities']);
 
         $data['agent_id']   = $user->id;
         $data['created_by'] = $user->id;
 
         $property = Property::create($data);
+        $property->amenities()->sync($amenityIds);
 
         return response()->json([
             'message'  => 'Property created successfully',
@@ -162,7 +177,14 @@ class PropertyController extends Controller
             'latitude'         => 'nullable|numeric|between:-90,90',
             'longitude'        => 'nullable|numeric|between:-180,180',
             'status'           => 'sometimes|in:available,sold,rented',
+            'amenities'        => 'sometimes|array',
+            'amenities.*'      => 'integer|exists:amenities,id',
         ]);
+
+        if (array_key_exists('amenities', $data)) {
+            $property->amenities()->sync($data['amenities']);
+            unset($data['amenities']);
+        }
 
         $property->update($data);
 

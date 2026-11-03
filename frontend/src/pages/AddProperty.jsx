@@ -13,6 +13,8 @@ export default function AddProperty({ user }) {
   const [types, setTypes] = useState([])
   const [cities, setCities] = useState([])
   const [districts, setDistricts] = useState([])
+  const [amenityList, setAmenityList] = useState([])
+  const [selectedAmenities, setSelectedAmenities] = useState([])
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -43,7 +45,20 @@ export default function AddProperty({ user }) {
       .then((res) => res.json())
       .then(setCities)
       .catch(() => {})
+
+    fetch(`${API}/api/amenities`)
+      .then((res) => res.json())
+      .then(setAmenityList)
+      .catch(() => {})
   }, [])
+
+  function toggleAmenity(amenityId) {
+    setSelectedAmenities((current) =>
+      current.includes(amenityId)
+        ? current.filter((value) => value !== amenityId)
+        : [...current, amenityId]
+    )
+  }
 
   async function handleCityChange(e) {
     const value = e.target.value
@@ -82,6 +97,7 @@ export default function AddProperty({ user }) {
       city_id: Number(cityId),
       district_id: districtId === '' ? null : Number(districtId),
       address,
+      amenities: selectedAmenities,
     }
 
     try {
@@ -235,6 +251,22 @@ export default function AddProperty({ user }) {
           {t('add.address')}
           <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required maxLength={255} style={fieldStyle} />
         </label>
+
+        <fieldset style={{ border: '1px solid #888', borderRadius: 8, padding: 12 }}>
+          <legend>{t('add.amenities')}</legend>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {amenityList.map((item) => (
+              <label key={item.id} style={{ display: 'flex', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={selectedAmenities.includes(item.id)}
+                  onChange={() => toggleAmenity(item.id)}
+                />
+                {item.icon} {item.name}
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         <label>
           {t('add.photos')}

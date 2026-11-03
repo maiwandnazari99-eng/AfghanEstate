@@ -201,6 +201,19 @@ export default function PropertyDetails() {
       <h3>{t('property.address')}</h3>
       <p>{property.address}</p>
 
+      {property.amenities?.length > 0 && (
+        <>
+          <h3>{t('property.amenities')}</h3>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {property.amenities.map((item) => (
+              <span key={item.id} style={{ border: '1px solid #888', borderRadius: 16, padding: '4px 12px' }}>
+                {item.icon} {item.name}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
+
       <h3>{t('property.listedBy')}</h3>
       <p>
         {property.agent?.user?.name}
