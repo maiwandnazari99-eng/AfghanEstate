@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import PropertyDetails from './pages/PropertyDetails'
 import AddProperty from './pages/AddProperty'
 import MyProperties from './pages/MyProperties'
+import EditProperty from './pages/EditProperty'
 import Favorites from './pages/Favorites'
 import Messages from './pages/Messages'
 import Login from './pages/Login'
@@ -74,6 +75,7 @@ function Shell() {
         <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/add-property" element={<AddProperty user={user} />} />
         <Route path="/my-properties" element={<MyProperties user={user} />} />
+        <Route path="/edit-property/:id" element={<EditProperty user={user} />} />
         <Route path="/favorites" element={<Favorites user={user} />} />
         <Route path="/messages" element={<Messages user={user} />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />

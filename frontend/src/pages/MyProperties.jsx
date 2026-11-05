@@ -126,6 +126,7 @@ export default function MyProperties({ user }) {
                   <option value="rented">{t('property.status_rented')}</option>
                 </select>
                 <Link to={`/properties/${p.id}`}>{t('mine.view')}</Link>
+                <Link to={`/edit-property/${p.id}`}>{t('mine.edit')}</Link>
                 <button onClick={() => deleteItem(p.id)} style={{ padding: '6px 10px' }}>
                   {t('mine.delete')}
                 </button>

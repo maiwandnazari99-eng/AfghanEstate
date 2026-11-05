@@ -96,6 +96,20 @@ const en = {
       next: 'Next',
       page: 'Page {{current}} of {{last}}',
     },
+    edit: {
+      title: 'Edit property',
+      save: 'Save changes',
+      cancel: 'Cancel',
+      notOwner: 'You can only edit your own properties.',
+      photos: 'Photos',
+      noPhotos: 'No photos yet.',
+      cover: 'Cover photo',
+      makeCover: 'Make cover',
+      deletePhoto: 'Delete',
+      confirmDeletePhoto: 'Delete this photo?',
+      addPhotos: 'Add photos (jpg, png or webp, max 4 MB each)',
+      upload: 'Upload photos',
+    },
     mine: {
       title: 'My properties',
       empty: 'You have not added any properties yet.',
@@ -103,6 +117,7 @@ const en = {
       delete: 'Delete',
       confirmDelete: 'Delete this property? This cannot be undone.',
       view: 'View',
+      edit: 'Edit',
       updateError: 'Could not update the property.',
     },
     favorites: {
